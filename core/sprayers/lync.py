@@ -34,7 +34,10 @@ class Lync:
         else:
             self.log.info(print_info("S4B domain appears to be hosted internally"))
             self.log.info(print_good(f"Internal hostname of S4B server: {self.get_internal_s4b_hostname(self.lync_base_url)}"))
-            self.lync_auth_url = urlparse.urljoin('/'.join(self.lync_base_url.split('/')[0:3]), "/WebTicket/oauthtoken")
+            self.lync_auth_url = urlparse.urljoin(
+                '/'.join(self.lync_base_url.split('/')[:3]),
+                "/WebTicket/oauthtoken",
+            )
 
     def shutdown(self):
         with open('lync_valid_accounts.txt', 'a+') as account_file:

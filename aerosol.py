@@ -53,12 +53,15 @@ class Aerosol:
 
     def response(self, flow: http.HTTPFlow) -> None:
         try:
-            if "html" in flow.response.headers["Content-Type"] and len(flow.response.content):
-                if ctx.options.target in flow.request.host:
-                    html = lxml.html.fromstring(flow.response.content)
-                    the_best_words = set(html.xpath('//text()'))
-                    ctx.log.info(print_good(f"Got {len(the_best_words)} words, the best words..."))
-                    self.words |= the_best_words
+            if (
+                "html" in flow.response.headers["Content-Type"]
+                and len(flow.response.content)
+                and ctx.options.target in flow.request.host
+            ):
+                html = lxml.html.fromstring(flow.response.content)
+                the_best_words = set(html.xpath('//text()'))
+                ctx.log.info(print_good(f"Got {len(the_best_words)} words, the best words..."))
+                self.words |= the_best_words
         except KeyError:
             pass
 

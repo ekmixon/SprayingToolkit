@@ -9,7 +9,7 @@ from core.utils.messages import *
 class OWA:
     def __init__(self, target):
         self.url = target if target.startswith('https://') or target.startswith('http://') else None
-        self.domain = target if not self.url else None
+        self.domain = None if self.url else target
         self.log = logging.getLogger('owasprayer')
         self.valid_accounts = set()
         self.autodiscover_url = None
@@ -43,7 +43,12 @@ class OWA:
             self.netbios_domain = self.get_owa_domain(self.autodiscover_url)
             self.log.info(print_good(f"Got internal domain name using OWA: {self.netbios_domain}"))
         except Exception as e:
-            self.log.error(print_bad(f"Error parsing internal domain name using OWA. This usually means OWA is being hosted on-prem or the target has a hybrid AD deployment"))
+            self.log.error(
+                print_bad(
+                    "Error parsing internal domain name using OWA. This usually means OWA is being hosted on-prem or the target has a hybrid AD deployment"
+                )
+            )
+
             self.log.error("    Do some recon and pass the custom OWA URL as the target if you really want the internal domain name, password spraying can still continue though :)\n")
             self.log.error(f"    Full error: {e}\n")
 
@@ -79,7 +84,7 @@ class OWA:
         for url in urls:
             try:
                 r = requests.get(url, headers=headers, verify=False)
-                if r.status_code == 401 or r.status_code == 403:
+                if r.status_code in [401, 403]:
                     return url
             except ConnectionError:
                 continue

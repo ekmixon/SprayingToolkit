@@ -122,9 +122,9 @@ def opt_str_struct(name, st, offset):
     nxt = st[offset:offset + 8]
     if len(nxt) == 8:
         hdr_tup = struct.unpack("<hhi", nxt)
-        print("%s: %s" % (name, StrStruct(hdr_tup, st)))
+        print(f"{name}: {StrStruct(hdr_tup, st)}")
     else:
-        print("%s: [omitted]" % name)
+        print(f"{name}: [omitted]")
 
 
 def opt_inline_str(name, st, offset, sz):
@@ -132,7 +132,7 @@ def opt_inline_str(name, st, offset, sz):
     if len(nxt) == sz:
         print("%s: '%s'" % (name, clean_str(nxt)))
     else:
-        print("%s: [omitted]" % name)
+        print(f"{name}: [omitted]")
 
 
 def pretty_print_request(st):
@@ -195,11 +195,11 @@ def pretty_print_challenge(st):
 def pretty_print_response(st):
     hdr_tup = struct.unpack("<hhihhihhihhihhi", st[12:52])
 
-    print("LM Resp: %s" % StrStruct(hdr_tup[0:3], st))
-    print("NTLM Resp: %s" % StrStruct(hdr_tup[3:6], st))
-    print("Target Name: %s" % StrStruct(hdr_tup[6:9], st))
-    print("User Name: %s" % StrStruct(hdr_tup[9:12], st))
-    print("Host Name: %s" % StrStruct(hdr_tup[12:15], st))
+    print(f"LM Resp: {StrStruct(hdr_tup[:3], st)}")
+    print(f"NTLM Resp: {StrStruct(hdr_tup[3:6], st)}")
+    print(f"Target Name: {StrStruct(hdr_tup[6:9], st)}")
+    print(f"User Name: {StrStruct(hdr_tup[9:12], st)}")
+    print(f"Host Name: {StrStruct(hdr_tup[12:15], st)}")
 
     opt_str_struct("Session Key", st, 52)
     opt_inline_str("OS Ver", st, 64, 8)
@@ -220,17 +220,10 @@ def ntlmdecode(authenticate_header):
     except Exception as e:
         raise Exception(f"Input seems to be a non-valid base64-encoded string: '{authenticate_header}'")
 
-    if not st[:8] == b'NTLMSSP\x00':
+    if st[:8] != b'NTLMSSP\x00':
         raise Exception("NTLMSSP header not found at start of input string")
 
     ver_tup = struct.unpack("<i", st[8:12])
     ver = ver_tup[0]
 
-    #print("Msg Type: %d (%s)" % (ver, msg_types[ver]))
-
-    #if ver == 1:
-        #pretty_print_request(st)
-
     return pretty_print_challenge(st)
-
-    raise Exception(f"Unknown message structure.  Have a raw (hex-encoded) message: {hexlify(st)}")

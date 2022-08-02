@@ -27,7 +27,7 @@ class IMAP:
         except imapclient.exceptions.LoginError:
             log.info(print_bad(f"Authentication failed: {username}:{password} (Login failed)"))
         except Exception as e:
-            self.log.error(print_bad(f"Error communicating with the IMAP server"))
+            self.log.error(print_bad("Error communicating with the IMAP server"))
             self.log.error(f"    Full error: {e}\n")
 
     def __str__(self):

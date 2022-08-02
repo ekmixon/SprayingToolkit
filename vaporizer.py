@@ -80,7 +80,6 @@ class Vaporizer:
 
     def response(self, flow: http.HTTPFlow) -> None:
         try:
-            emails = []
             if "html" in flow.response.headers["Content-Type"] and len(flow.response.content):
                 if "google.com" in flow.request.host:
                     names = google(flow.response.content)
@@ -89,6 +88,7 @@ class Vaporizer:
                 else:
                     return
 
+                emails = []
                 for name in names:
                     first, last, full_text = name
                     ctx.log.info(colored(f"{full_text} => {first} {last}", "yellow"))
